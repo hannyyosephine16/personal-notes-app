@@ -12,8 +12,8 @@ function NotFoundPage({ onBackToHome }) {
   
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
-      <h2>404 - Page Not Found</h2>
-      <p>The page you're looking for doesn't exist or has been moved.</p>
+      <h2>404 - Halaman Tidak Ditemukan</h2>
+      <p>Halaman yang Anda cari tidak ada atau telah dipindahkan.</p>
       <button 
         onClick={handleBackClick}
         style={{ 
@@ -27,7 +27,7 @@ function NotFoundPage({ onBackToHome }) {
           cursor: 'pointer'
         }}
       >
-        Back to Home
+        Kembali ke Beranda
       </button>
     </div>
   );
@@ -38,4 +38,3 @@ NotFoundPage.propTypes = {
 };
 
 export default NotFoundPage;
-

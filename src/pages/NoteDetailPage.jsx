@@ -13,7 +13,9 @@ function NoteDetailPage({ noteId, onBackToHome }) {
       console.log('Note found:', selectedNote);
       setNote(selectedNote);
     } else {
-      console.log('Note not found, navigating back to home');
+      console.log('Note not found, navigating to 404');
+      // Arahkan ke halaman 404 jika catatan tidak ditemukan
+      window.history.pushState({}, '', '/404');
       onBackToHome();
     }
   }, [noteId, onBackToHome]);
@@ -44,7 +46,7 @@ function NoteDetailPage({ noteId, onBackToHome }) {
   };
   
   if (!note) {
-    return <p>Loading...</p>;
+    return <p>Memuat...</p>;
   }
   
   return (
@@ -61,7 +63,7 @@ function NoteDetailPage({ noteId, onBackToHome }) {
             position: 'relative',
             zIndex: 100
           }}
-          title="Delete"
+          title="Hapus"
         >
           🗑️
         </button>
@@ -73,7 +75,7 @@ function NoteDetailPage({ noteId, onBackToHome }) {
             position: 'relative',
             zIndex: 100
           }}
-          title={note.archived ? "Unarchive" : "Archive"}
+          title={note.archived ? "Batal Arsip" : "Arsipkan"}
         >
           {note.archived ? '⟲' : '📁'}
         </button>

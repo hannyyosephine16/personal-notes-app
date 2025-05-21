@@ -22,7 +22,7 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
   
   return (
     <header>
-      <h1>Notes App</h1>
+      <h1>Aplikasi Catatan</h1>
       <div className="navigation">
         <ul>
           <li>
@@ -37,7 +37,7 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
                 textDecoration: activePage === 'home' ? 'underline' : 'none'
               }}
             >
-              Home
+              Beranda
             </button>
           </li>
           <li>
@@ -52,7 +52,7 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
                 textDecoration: activePage === 'archives' ? 'underline' : 'none'
               }}
             >
-              Archives
+              Arsip
             </button>
           </li>
         </ul>
@@ -60,7 +60,7 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
       <div className="search-bar">
         <input 
           type="text"
-          placeholder="Search notes by title..."
+          placeholder="Cari catatan berdasarkan judul..."
           value={searchQuery}
           onChange={onSearchChangeHandler}
         />

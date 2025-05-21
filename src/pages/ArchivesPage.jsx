@@ -7,7 +7,7 @@ function ArchivesPage({ searchQuery, onViewDetail }) {
   const [archivedNotes, setArchivedNotes] = useState([]);
   
   useEffect(() => {
-    // Get fresh data on component mount
+    // Dapatkan data baru pada pemuatan komponen
     console.log('ArchivesPage: Loading archived notes');
     const archived = getArchivedNotes();
     console.log('Archived notes:', archived);
@@ -17,14 +17,14 @@ function ArchivesPage({ searchQuery, onViewDetail }) {
   const onDeleteHandler = (id) => {
     console.log('ArchivesPage: Deleting archived note with id:', id);
     deleteNote(id);
-    // Update local state after deletion
+    // Perbarui state lokal setelah penghapusan
     setArchivedNotes(getArchivedNotes());
   };
   
   const onUnarchiveHandler = (id) => {
     console.log('ArchivesPage: Unarchiving note with id:', id);
     unarchiveNote(id);
-    // Update local state after unarchiving
+    // Perbarui state lokal setelah pembatalan arsip
     setArchivedNotes(getArchivedNotes());
   };
   
@@ -33,18 +33,18 @@ function ArchivesPage({ searchQuery, onViewDetail }) {
     onViewDetail(id);
   };
   
-  const filteredNotes = searchQuery.length > 0
+  const filteredNotes = searchQuery && searchQuery.length > 0
     ? archivedNotes.filter(note => note.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : archivedNotes;
   
   return (
     <div className="archives-page">
-      <h2>Archived Notes</h2>
+      <h2>Catatan Terarsip</h2>
       <NotesList 
         notes={filteredNotes} 
         onDelete={onDeleteHandler} 
         onArchive={onUnarchiveHandler}
-        emptyMessage="Archive is empty. Archive some notes first!"
+        emptyMessage="Arsip kosong. Arsipkan beberapa catatan terlebih dahulu!"
         onViewDetail={handleViewNoteDetail}
       />
     </div>

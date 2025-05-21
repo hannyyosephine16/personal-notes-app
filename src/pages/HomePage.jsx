@@ -7,7 +7,7 @@ function HomePage({ searchQuery, onViewDetail }) {
   const [notes, setNotes] = useState([]);
   
   useEffect(() => {
-    // Get fresh data on component mount
+    // Dapatkan data baru pada pemuatan komponen
     console.log('HomePage: Loading active notes');
     const activeNotes = getActiveNotes();
     console.log('Active notes:', activeNotes);
@@ -17,20 +17,18 @@ function HomePage({ searchQuery, onViewDetail }) {
   const onDeleteHandler = (id) => {
     console.log('HomePage: Deleting note with id:', id);
     deleteNote(id);
-    // Update local state after deletion
+    // Perbarui state lokal setelah penghapusan
     setNotes(getActiveNotes());
   };
   
   const onArchiveHandler = (id) => {
     console.log('HomePage: Archiving note with id:', id);
     archiveNote(id);
-    // Update local state after archiving
+    // Perbarui state lokal setelah pengarsipan
     setNotes(getActiveNotes());
   };
   
-  // Fixed Add New Note handler
   const handleAddNewNote = (event) => {
-    // Always prevent default and stop propagation
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -44,24 +42,24 @@ function HomePage({ searchQuery, onViewDetail }) {
     onViewDetail(id);
   };
   
-  const filteredNotes = searchQuery.length > 0
+  const filteredNotes = searchQuery && searchQuery.length > 0
     ? notes.filter(note => note.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : notes;
   
   return (
     <div className="homepage">
-      <h2>Active Notes</h2>
+      <h2>Catatan Aktif</h2>
       <NotesList 
         notes={filteredNotes} 
         onDelete={onDeleteHandler} 
         onArchive={onArchiveHandler}
-        emptyMessage="No notes found. Create one now!"
+        emptyMessage="Tidak ada catatan. Buat catatan baru sekarang!"
         onViewDetail={handleViewNoteDetail}
       />
       <div className="homepage__action">
         <button 
           className="action" 
-          title="Add New Note" 
+          title="Tambah Catatan Baru" 
           onClick={handleAddNewNote}
           style={{ 
             position: 'relative', 

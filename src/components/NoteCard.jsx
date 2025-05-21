@@ -21,16 +21,7 @@ function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, o
 
   const handleCardClick = (event) => {
     event.preventDefault();
-    event.stopPropagation();
     console.log('Card clicked for note:', id);
-    onViewDetail(id);
-  };
-
-  const handleTitleClick = (event) => {
-    // Prevent default behavior and stop propagation
-    event.preventDefault();
-    event.stopPropagation();
-    console.log('Title clicked for note:', id);
     onViewDetail(id);
   };
 
@@ -46,7 +37,6 @@ function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, o
     >
       <h3 
         className="note-item__title" 
-        onClick={handleTitleClick} 
         style={{ cursor: 'pointer' }}
       >
         {title}
@@ -70,7 +60,7 @@ function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, o
             zIndex: 20
           }}
         >
-          🗑️
+          🗑
         </button>
         <button 
           onClick={handleArchive} 

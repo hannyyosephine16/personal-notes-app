@@ -33,13 +33,13 @@ function AddNotePage({ onBackToHome }) {
       <div className="add-new-page__input">
         <input
           className="add-new-page__input__title"
-          placeholder="Note title"
+          placeholder="Judul catatan"
           value={title}
           onChange={onTitleChangeHandler}
         />
         <div
           className="add-new-page__input__body"
-          data-placeholder="Write your note here..."
+          data-placeholder="Tulis catatan Anda di sini..."
           contentEditable
           onInput={onBodyInputHandler}
         />
@@ -48,13 +48,13 @@ function AddNotePage({ onBackToHome }) {
         <button 
           className="action" 
           onClick={onSubmitHandler}
-          title="Save Note"
+          title="Simpan Catatan"
           style={{ 
             position: 'relative', 
             zIndex: 100 
           }}
         >
-          ➕
+          ✓
         </button>
       </div>
     </div>
