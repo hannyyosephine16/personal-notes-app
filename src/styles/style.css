@@ -251,9 +251,28 @@ main {
   pointer-events: auto;
 }
 
+/* Add these styles to the end of your style.css file */
+
+/* Fix untuk memastikan button bisa diklik */
+.action {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
 /* Fix untuk memastikan container app tidak menghalangi event klik */
 .app-container {
   position: relative;
+}
+
+/* Perbaikan untuk button yang ada di fixed position */
+.detail-page__action, .homepage__action, .add-new-page__action {
+  position: fixed;
+  display: flex;
+  gap: 16px;
+  bottom: 32px;
+  right: 32px;
+  z-index: 100;
 }
 
 /* Perbaikan untuk mobile */

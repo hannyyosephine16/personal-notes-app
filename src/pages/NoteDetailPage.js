@@ -21,6 +21,7 @@ function NoteDetailPage({ noteId, onBackToHome }) {
   const onDeleteHandler = (event) => {
     if (event) {
       event.preventDefault();
+      event.stopPropagation();
     }
     console.log('NoteDetailPage: Deleting note with id:', note.id);
     deleteNote(note.id);
@@ -30,6 +31,7 @@ function NoteDetailPage({ noteId, onBackToHome }) {
   const onArchiveHandler = (event) => {
     if (event) {
       event.preventDefault();
+      event.stopPropagation();
     }
     console.log('NoteDetailPage: Toggling archive status for note with id:', note.id);
     if (note.archived) {
@@ -54,7 +56,11 @@ function NoteDetailPage({ noteId, onBackToHome }) {
         <button 
           className="action" 
           onClick={onDeleteHandler}
-          style={{ backgroundColor: '#CF6679' }}
+          style={{ 
+            backgroundColor: '#CF6679',
+            position: 'relative',
+            zIndex: 100
+          }}
           title="Delete"
         >
           🗑️
@@ -62,7 +68,11 @@ function NoteDetailPage({ noteId, onBackToHome }) {
         <button 
           className="action" 
           onClick={onArchiveHandler}
-          style={{ backgroundColor: note.archived ? '#03DAC6' : '#F39C12' }}
+          style={{ 
+            backgroundColor: note.archived ? '#03DAC6' : '#F39C12',
+            position: 'relative',
+            zIndex: 100
+          }}
           title={note.archived ? "Unarchive" : "Archive"}
         >
           {note.archived ? '⟲' : '📁'}
@@ -78,76 +88,3 @@ NoteDetailPage.propTypes = {
 };
 
 export default NoteDetailPage;
-
-// import React, { useState, useEffect } from 'react';
-// import PropTypes from 'prop-types';
-// import { getNote, deleteNote, archiveNote, unarchiveNote } from '../utils/local-data';
-// import { showFormattedDate } from '../utils/index';
-
-// function NoteDetailPage({ noteId, onBackToHome, onNotesChange }) {
-//   const [note, setNote] = useState(null);
-  
-//   useEffect(() => {
-//     const selectedNote = getNote(noteId);
-//     if (selectedNote) {
-//       setNote(selectedNote);
-//     } else {
-//       onBackToHome();
-//     }
-//   }, [noteId, onBackToHome]);
-  
-//   const onDeleteHandler = (id) => {
-//     deleteNote(id);
-//     onNotesChange(); // Notify parent about the change
-//     onBackToHome();
-//   };
-  
-//   const onArchiveHandler = (id) => {
-//     if (note.archived) {
-//       unarchiveNote(id);
-//       setNote({ ...note, archived: false });
-//     } else {
-//       archiveNote(id);
-//       setNote({ ...note, archived: true });
-//     }
-//     onNotesChange(); // Notify parent about the change
-//   };
-  
-//   if (!note) {
-//     return <p>Loading...</p>;
-//   }
-  
-//   return (
-//     <div className="detail-page">
-//       <h2 className="detail-page__title">{note.title}</h2>
-//       <p className="detail-page__createdAt">{showFormattedDate(note.createdAt)}</p>
-//       <div className="detail-page__body" dangerouslySetInnerHTML={{ __html: note.body }}></div>
-//       <div className="detail-page__action">
-//         <button 
-//           className="action" 
-//           onClick={() => onDeleteHandler(note.id)}
-//           style={{ backgroundColor: '#CF6679' }}
-//           title="Delete"
-//         >
-//           🗑️
-//         </button>
-//         <button 
-//           className="action" 
-//           onClick={() => onArchiveHandler(note.id)}
-//           style={{ backgroundColor: note.archived ? '#03DAC6' : '#F39C12' }}
-//           title={note.archived ? "Unarchive" : "Archive"}
-//         >
-//           {note.archived ? '⟲' : '📁'}
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
-
-// NoteDetailPage.propTypes = {
-//   noteId: PropTypes.string.isRequired,
-//   onBackToHome: PropTypes.func.isRequired,
-//   onNotesChange: PropTypes.func
-// };
-
-// export default NoteDetailPage;
