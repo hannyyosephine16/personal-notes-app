@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes App Preview</title>
+  <style>
+    :root {
+      --primary: #BB86FC;
+      --primary-variant: #3700B3;
+      --secondary: #03DAC6;
+      --background: #121212;
+      --surface: #121212;
+      --error: #CF6679;
+      --warning: #F39C12;
+      --on-background: #FFFFFF;
+      --on-background-grey: #c7c7c7;
+      --on-surface: #FFFFFF;
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .app-container {
+      color: var(--on-background);
+      background-color: var(--background);
+      min-height: 100vh;
+      transition: all ease-in-out 0.5s;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid var(--on-background);
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      flex: 1;
+      color: var(--primary);
+    }
+
+    header .navigation ul li {
+      display: inline-block;
+      font-size: 18px;
+      margin: 0 8px;
+    }
+
+    .search-bar {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .search-bar input {
+      margin: 8px 0;
+      font-family: inherit;
+      background-color: transparent;
+      border: 1px solid var(--on-background);
+      border-radius: 4px;
+      padding: 8px;
+      width: 100%;
+      color: var(--on-background);
+    }
+
+    main {
+      margin: 0 auto;
+      padding: 32px 20px;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    .notes-list {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 16px 8px;
+    }
+
+    .note-item {
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--on-background);
+      border-top: 5px solid var(--primary);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .note-item__title {
+      margin: 4px 0;
+      color: var(--primary);
+    }
+
+    .note-item__createdAt {
+      color: var(--on-background-grey);
+      font-size: 14px;
+      margin: 4px 0;
+    }
+
+    .note-item__body {
+      margin-top: 16px;
+      overflow: hidden;
+      display: -webkit-box;
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+    }
+
+    .action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      border: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50px;
+      background-color: var(--on-background);
+      color: var(--background);
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .detail-page__title {
+      font-size: 38px;
+      margin-bottom: 8px;
+      word-wrap: break-word;
+      color: var(--primary);
+    }
+
+    .detail-page__createdAt {
+      color: var(--on-background-grey);
+    }
+
+    .detail-page__body {
+      line-height: 1.5;
+      margin-top: 36px;
+      font-size: 18px;
+    }
+
+    .detail-page__action, .homepage__action {
+      position: fixed;
+      display: flex;
+      gap: 16px;
+      bottom: 32px;
+      right: 32px;
+    }
+
+    @media screen and (min-width: 650px) {
+      .notes-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      header {
+        flex-wrap: nowrap;
+      }
+      
+      .search-bar {
+        width: auto;
+        margin-top: 0;
+      }
+    }
+
+    @media screen and (min-width: 850px) {
+      .notes-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media screen and (min-width: 1200px) {
+      .notes-list {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>Notes App</h1>
+      <div class="navigation">
+        <ul>
+          <li><button style="background: none; border: none; cursor: pointer; font-size: 18px; color: var(--on-background); text-decoration: underline;">Home</button></li>
+          <li><button style="background: none; border: none; cursor: pointer; font-size: 18px; color: var(--on-background);">Archives</button></li>
+        </ul>
+      </div>
+      <div class="search-bar">
+        <input type="text" placeholder="Search notes by title...">
+      </div>
+    </header>
+    
+    <main>
+      <h2>Active Notes</h2>
+      <div class="notes-list">
+        <div class="note-item" style="border-top-color: #BB86FC;">
+          <h3 class="note-item__title">Babel</h3>
+          <p class="note-item__createdAt">Kamis, 14 April 2022</p>
+          <div class="note-item__body">Babel merupakan tools open-source yang digunakan untuk mengubah sintaks ECMAScript 2015+ menjadi sintaks yang didukung oleh JavaScript engine versi lama. Babel sering dipakai ketika kita menggunakan sintaks terbaru termasuk sintaks JSX.</div>
+          <div style="margin-top: 16px; display: flex; gap: 8px;">
+            <button class="action" title="Delete" style="background-color: #CF6679;">🗑️</button>
+            <button class="action" title="Archive" style="background-color: #F39C12;">📁</button>
+          </div>
+        </div>
+        
+        <div class="note-item" style="border-top-color: #BB86FC;">
+          <h3 class="note-item__title">Functional Component</h3>
+          <p class="note-item__createdAt">Kamis, 14 April 2022</p>
+          <div class="note-item__body">Functional component merupakan React component yang dibuat menggunakan fungsi JavaScript. Agar fungsi JavaScript dapat disebut component ia harus mengembalikan React element dan dipanggil layaknya React component.</div>
+          <div style="margin-top: 16px; display: flex; gap: 8px;">
+            <button class="action" title="Delete" style="background-color: #CF6679;">🗑️</button>
+            <button class="action" title="Archive" style="background-color: #F39C12;">📁</button>
+          </div>
+        </div>
+        
+        <div class="note-item" style="border-top-color: #BB86FC;">
+          <h3 class="note-item__title">Modularization</h3>
+          <p class="note-item__createdAt">Kamis, 14 April 2022</p>
+          <div class="note-item__body">Dalam konteks pemrograman JavaScript, modularization merupakan teknik dalam memecah atau menggunakan kode dalam berkas JavaScript secara terpisah berdasarkan tanggung jawabnya masing-masing.</div>
+          <div style="margin-top: 16px; display: flex; gap: 8px;">
+            <button class="action" title="Delete" style="background-color: #CF6679;">🗑️</button>
+            <button class="action" title="Archive" style="background-color: #F39C12;">📁</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="homepage__action">
+        <button class="action" title="Add New Note">➕</button>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <title>Contact Apps</title>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/index.jsx"></script>
+</body>
+</html> -->
