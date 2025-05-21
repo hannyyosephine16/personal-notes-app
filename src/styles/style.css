@@ -244,7 +244,30 @@ main {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+/* Fix untuk memastikan button bisa diklik */
+.action {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
 
+/* Fix untuk memastikan container app tidak menghalangi event klik */
+.app-container {
+  position: relative;
+}
+
+/* Perbaikan untuk mobile */
+@media screen and (max-width: 768px) {
+  .detail-page__action, .homepage__action, .add-new-page__action {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .action {
+    width: 48px;
+    height: 48px;
+  }
+}
 /* :root {
   --primary: #BB86FC;
   --primary-variant: #3700B3;

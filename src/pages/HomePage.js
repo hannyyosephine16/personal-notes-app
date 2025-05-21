@@ -65,21 +65,43 @@ function HomePage({ searchQuery, onViewDetail }) {
   
   useEffect(() => {
     // Get fresh data on component mount
-    setNotes(getActiveNotes());
+    console.log('HomePage: Loading active notes');
+    const activeNotes = getActiveNotes();
+    console.log('Active notes:', activeNotes);
+    setNotes(activeNotes);
   }, []);
   
   const onDeleteHandler = (id) => {
-    console.log('Deleting note with id:', id);
+    console.log('HomePage: Deleting note with id:', id);
     deleteNote(id);
-    // Update local state
+    // Update local state after deletion
     setNotes(getActiveNotes());
   };
   
   const onArchiveHandler = (id) => {
-    console.log('Archiving note with id:', id);
+    console.log('HomePage: Archiving note with id:', id);
     archiveNote(id);
-    // Update local state
+    // Update local state after archiving
     setNotes(getActiveNotes());
+  };
+  
+  // const handleAddNewNote = (event) => {
+  //   if (event) {
+  //     event.preventDefault();
+  //   }
+  //   console.log('HomePage: Add new note button clicked');
+  //   onViewDetail('new');
+  // };
+
+  const handleAddNewNote = (event) => {
+  event.preventDefault();
+  console.log('Add button clicked');
+  onViewDetail('new');
+};
+  
+  const handleViewNoteDetail = (id) => {
+    console.log('HomePage: View note detail for id:', id);
+    onViewDetail(id);
   };
   
   const filteredNotes = searchQuery.length > 0
@@ -94,16 +116,13 @@ function HomePage({ searchQuery, onViewDetail }) {
         onDelete={onDeleteHandler} 
         onArchive={onArchiveHandler}
         emptyMessage="No notes found. Create one now!"
-        onViewDetail={onViewDetail}
+        onViewDetail={handleViewNoteDetail}
       />
       <div className="homepage__action">
         <button 
           className="action" 
           title="Add New Note" 
-          onClick={() => {
-            console.log('Add button clicked');
-            onViewDetail('new');
-          }}
+          onClick={handleAddNewNote}
         >
           ➕
         </button>

@@ -4,27 +4,43 @@ import { showFormattedDate } from '../utils/index';
 
 function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, onViewDetail }) {
   const handleDelete = (event) => {
-    event.stopPropagation(); // Prevent click from bubbling up
+    // Always stop propagation to prevent clicking the card
+    event.stopPropagation();
+    event.preventDefault();
     console.log('Delete button clicked for note:', id);
     onDelete(id);
   };
 
   const handleArchive = (event) => {
-    event.stopPropagation(); // Prevent click from bubbling up
+    // Always stop propagation to prevent clicking the card
+    event.stopPropagation();
+    event.preventDefault();
     console.log('Archive/unarchive button clicked for note:', id);
     onArchive(id);
   };
 
-  const handleViewDetail = () => {
-    console.log('Viewing details for note:', id);
+  const handleCardClick = () => {
+    console.log('Card clicked for note:', id);
+    onViewDetail(id);
+  };
+
+  const handleTitleClick = (event) => {
+    // Prevent default behavior and stop propagation
+    event.preventDefault();
+    event.stopPropagation();
+    console.log('Title clicked for note:', id);
     onViewDetail(id);
   };
 
   return (
-    <div className="note-item" style={{ borderTopColor: archived ? '#F39C12' : '#BB86FC' }}>
+    <div 
+      className="note-item" 
+      style={{ borderTopColor: archived ? '#F39C12' : '#BB86FC', cursor: 'pointer' }}
+      onClick={handleCardClick}
+    >
       <h3 
         className="note-item__title" 
-        onClick={handleViewDetail} 
+        onClick={handleTitleClick} 
         style={{ cursor: 'pointer' }}
       >
         {title}
@@ -65,7 +81,6 @@ NoteCard.propTypes = {
 };
 
 export default NoteCard;
-
 // import React from 'react';
 // import PropTypes from 'prop-types';
 // import { showFormattedDate } from '../utils/index';

@@ -14,8 +14,11 @@ function AddNotePage({ onBackToHome }) {
     setBody(event.target.innerHTML);
   };
   
-  const onSubmitHandler = () => {
-    console.log('Adding note with title:', title);
+  const onSubmitHandler = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    console.log('AddNotePage: Adding note with title:', title);
     addNote({
       title,
       body

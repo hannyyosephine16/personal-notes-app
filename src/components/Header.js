@@ -4,7 +4,20 @@ import PropTypes from 'prop-types';
 function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
   const onSearchChangeHandler = (event) => {
     const query = event.target.value;
+    console.log('Search query changed to:', query);
     setSearchQuery(query);
+  };
+  
+  const handleHomeClick = (event) => {
+    event.preventDefault();
+    console.log('Home button clicked');
+    setActivePage('home');
+  };
+  
+  const handleArchivesClick = (event) => {
+    event.preventDefault();
+    console.log('Archives button clicked');
+    setActivePage('archives');
   };
   
   return (
@@ -14,7 +27,7 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
         <ul>
           <li>
             <button 
-              onClick={() => setActivePage('home')}
+              onClick={handleHomeClick}
               style={{ 
                 background: 'none', 
                 border: 'none', 
@@ -29,7 +42,7 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
           </li>
           <li>
             <button 
-              onClick={() => setActivePage('archives')}
+              onClick={handleArchivesClick}
               style={{ 
                 background: 'none', 
                 border: 'none', 

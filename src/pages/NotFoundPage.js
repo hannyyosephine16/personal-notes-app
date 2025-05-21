@@ -2,12 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function NotFoundPage({ onBackToHome }) {
+  const handleBackClick = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    console.log('NotFoundPage: Back to home button clicked');
+    onBackToHome();
+  };
+  
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
       <h2>404 - Page Not Found</h2>
       <p>The page you're looking for doesn't exist or has been moved.</p>
       <button 
-        onClick={onBackToHome}
+        onClick={handleBackClick}
         style={{ 
           display: 'inline-block', 
           marginTop: '20px',

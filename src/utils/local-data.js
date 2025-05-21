@@ -48,16 +48,25 @@ let notes = [
 const listeners = [];
 
 function notifyListeners() {
-  listeners.forEach(listener => listener());
+  console.log(`Notifying ${listeners.length} listeners about data change`);
+  listeners.forEach(listener => {
+    try {
+      listener();
+    } catch (e) {
+      console.error('Error in listener:', e);
+    }
+  });
 }
 
 function subscribeToChanges(listener) {
+  console.log('New listener subscribed');
   listeners.push(listener);
   // Return unsubscribe function
   return () => {
     const index = listeners.indexOf(listener);
     if (index > -1) {
       listeners.splice(index, 1);
+      console.log('Listener unsubscribed');
     }
   };
 }
@@ -67,19 +76,23 @@ function getAllNotes() {
 }
 
 function getNote(id) {
+  console.log(`Getting note with id: ${id}`);
   const foundedNote = notes.find((note) => note.id === id);
   return foundedNote ? {...foundedNote} : null; // Return a copy
 }
 
 function getActiveNotes() {
+  console.log('Getting active notes');
   return notes.filter((note) => !note.archived).map(note => ({...note})); // Return copies
 }
 
 function getArchivedNotes() {
+  console.log('Getting archived notes');
   return notes.filter((note) => note.archived).map(note => ({...note})); // Return copies
 }
 
 function addNote({ title, body }) {
+  console.log('Adding new note');
   const newNote = {
     id: `notes-${+new Date()}`,
     title: title || '(untitled)',
@@ -94,38 +107,65 @@ function addNote({ title, body }) {
 }
 
 function deleteNote(id) {
+  console.log(`Deleting note with id: ${id}`);
+  const previousLength = notes.length;
   notes = notes.filter((note) => note.id !== id);
-  notifyListeners(); // Notify about change
+  console.log(`Notes length before: ${previousLength}, after: ${notes.length}`);
+  
+  if (previousLength !== notes.length) {
+    notifyListeners(); // Notify about change only if something changed
+  }
 }
 
 function archiveNote(id) {
+  console.log(`Archiving note with id: ${id}`);
+  let wasChanged = false;
+  
   notes = notes.map((note) => {
-    if (note.id === id) {
+    if (note.id === id && !note.archived) {
+      wasChanged = true;
       return { ...note, archived: true };
     }
     return note;
   });
-  notifyListeners(); // Notify about change
+  
+  if (wasChanged) {
+    notifyListeners(); // Notify about change only if something changed
+  }
 }
 
 function unarchiveNote(id) {
+  console.log(`Unarchiving note with id: ${id}`);
+  let wasChanged = false;
+  
   notes = notes.map((note) => {
-    if (note.id === id) {
+    if (note.id === id && note.archived) {
+      wasChanged = true;
       return { ...note, archived: false };
     }
     return note;
   });
-  notifyListeners(); // Notify about change
+  
+  if (wasChanged) {
+    notifyListeners(); // Notify about change only if something changed
+  }
 }
 
 function editNote({ id, title, body }) {
+  console.log(`Editing note with id: ${id}`);
+  let wasChanged = false;
+  
   notes = notes.map((note) => {
     if (note.id === id) {
+      wasChanged = true;
       return { ...note, title, body };
     }
     return note;
   });
-  notifyListeners(); // Notify about change
+  
+  if (wasChanged) {
+    notifyListeners(); // Notify about change only if something changed
+  }
 }
 
 export {

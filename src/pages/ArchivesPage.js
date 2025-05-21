@@ -8,21 +8,29 @@ function ArchivesPage({ searchQuery, onViewDetail }) {
   
   useEffect(() => {
     // Get fresh data on component mount
-    setArchivedNotes(getArchivedNotes());
+    console.log('ArchivesPage: Loading archived notes');
+    const archived = getArchivedNotes();
+    console.log('Archived notes:', archived);
+    setArchivedNotes(archived);
   }, []);
   
   const onDeleteHandler = (id) => {
-    console.log('Deleting archived note with id:', id);
+    console.log('ArchivesPage: Deleting archived note with id:', id);
     deleteNote(id);
-    // Update local state
+    // Update local state after deletion
     setArchivedNotes(getArchivedNotes());
   };
   
   const onUnarchiveHandler = (id) => {
-    console.log('Unarchiving note with id:', id);
+    console.log('ArchivesPage: Unarchiving note with id:', id);
     unarchiveNote(id);
-    // Update local state
+    // Update local state after unarchiving
     setArchivedNotes(getArchivedNotes());
+  };
+  
+  const handleViewNoteDetail = (id) => {
+    console.log('ArchivesPage: View note detail for id:', id);
+    onViewDetail(id);
   };
   
   const filteredNotes = searchQuery.length > 0
@@ -37,7 +45,7 @@ function ArchivesPage({ searchQuery, onViewDetail }) {
         onDelete={onDeleteHandler} 
         onArchive={onUnarchiveHandler}
         emptyMessage="Archive is empty. Archive some notes first!"
-        onViewDetail={onViewDetail}
+        onViewDetail={handleViewNoteDetail}
       />
     </div>
   );
