@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { getNote, deleteNote, archiveNote, unarchiveNote } from '../utils/local-data';
 import { showFormattedDate } from '../utils/index';
 import { useNotification } from '../contexts/NotificationContext';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 
 function NoteDetailPage({ noteId, onBackToHome }) {
   const [note, setNote] = useState(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const { showSuccess, showWarning } = useNotification();
   
   useEffect(() => {
@@ -27,6 +29,12 @@ function NoteDetailPage({ noteId, onBackToHome }) {
       event.preventDefault();
       event.stopPropagation();
     }
+    
+    // Show custom delete confirmation dialog
+    setShowDeleteConfirmation(true);
+  };
+  
+  const confirmDelete = () => {
     console.log('NoteDetailPage: Deleting note with id:', note.id);
     
     // Store title before deletion for notification
@@ -40,6 +48,10 @@ function NoteDetailPage({ noteId, onBackToHome }) {
     
     // Navigate back to home
     onBackToHome();
+  };
+  
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
   };
   
   const onArchiveHandler = (event) => {
@@ -65,37 +77,46 @@ function NoteDetailPage({ noteId, onBackToHome }) {
   }
   
   return (
-    <div className="detail-page">
-      <h2 className="detail-page__title">{note.title}</h2>
-      <p className="detail-page__createdAt">{showFormattedDate(note.createdAt)}</p>
-      <div className="detail-page__body" dangerouslySetInnerHTML={{ __html: note.body }}></div>
-      <div className="detail-page__action">
-        <button 
-          className="action" 
-          onClick={onDeleteHandler}
-          style={{ 
-            backgroundColor: '#CF6679',
-            position: 'relative',
-            zIndex: 100
-          }}
-          title="Hapus"
-        >
-          🗑️
-        </button>
-        <button 
-          className="action" 
-          onClick={onArchiveHandler}
-          style={{ 
-            backgroundColor: note.archived ? '#03DAC6' : '#F39C12',
-            position: 'relative',
-            zIndex: 100
-          }}
-          title={note.archived ? "Batal Arsip" : "Arsipkan"}
-        >
-          {note.archived ? '⟲' : '📁'}
-        </button>
+    <>
+      <div className="detail-page">
+        <h2 className="detail-page__title">{note.title}</h2>
+        <p className="detail-page__createdAt">{showFormattedDate(note.createdAt)}</p>
+        <div className="detail-page__body" dangerouslySetInnerHTML={{ __html: note.body }}></div>
+        <div className="detail-page__action">
+          <button 
+            className="action" 
+            onClick={onDeleteHandler}
+            style={{ 
+              backgroundColor: '#CF6679',
+              position: 'relative',
+              zIndex: 100
+            }}
+            title="Hapus"
+          >
+            🗑️
+          </button>
+          <button 
+            className="action" 
+            onClick={onArchiveHandler}
+            style={{ 
+              backgroundColor: note.archived ? '#03DAC6' : '#F39C12',
+              position: 'relative',
+              zIndex: 100
+            }}
+            title={note.archived ? "Batal Arsip" : "Arsipkan"}
+          >
+            {note.archived ? '⟲' : '📁'}
+          </button>
+        </div>
       </div>
-    </div>
+
+      <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        message={`Apakah Anda yakin akan menghapus catatan "${note.title}"?`}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
+    </>
   );
 }
 

@@ -83,7 +83,8 @@ Notification.propTypes = {
 
 Notification.defaultProps = {
   type: 'info',
-  duration: 3000
+  duration: 3000,
+  onClose: () => {}
 };
 
 export default Notification;

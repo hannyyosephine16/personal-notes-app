@@ -24,7 +24,18 @@ class ErrorBoundary extends React.Component {
             <summary>Error details</summary>
             <pre>{this.state.error?.toString()}</pre>
           </details>
-          <button onClick={() => this.setState({ hasError: false })}>
+          <button 
+            onClick={() => this.setState({ hasError: false })}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: 'var(--primary)',
+              color: 'var(--on-background)',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginTop: '10px'
+            }}
+          >
             Try again
           </button>
         </div>

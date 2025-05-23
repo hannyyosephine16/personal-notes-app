@@ -27,7 +27,15 @@ function NotesList({ notes, onDelete, onArchive, emptyMessage, onViewDetail }) {
 }
 
 NotesList.propTypes = {
-  notes: PropTypes.arrayOf(PropTypes.object).isRequired,
+  notes: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      body: PropTypes.string.isRequired,
+      createdAt: PropTypes.string.isRequired,
+      archived: PropTypes.bool.isRequired
+    })
+  ).isRequired,
   onDelete: PropTypes.func.isRequired,
   onArchive: PropTypes.func.isRequired,
   emptyMessage: PropTypes.string.isRequired,
