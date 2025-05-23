@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import NotesList from '../components/NotesList';
-import { getArchivedNotes, deleteNote, unarchiveNote } from '../utils/local-data';
+import { getArchivedNotes, deleteNote, unarchiveNote, getNote } from '../utils/local-data';
+import { useNotification } from '../contexts/NotificationContext';
 
 function ArchivesPage({ searchQuery, onViewDetail }) {
   const [archivedNotes, setArchivedNotes] = useState([]);
+  const { showSuccess, showWarning } = useNotification();
   
   useEffect(() => {
     // Dapatkan data baru pada pemuatan komponen
@@ -16,16 +18,30 @@ function ArchivesPage({ searchQuery, onViewDetail }) {
   
   const onDeleteHandler = (id) => {
     console.log('ArchivesPage: Deleting archived note with id:', id);
-    deleteNote(id);
-    // Perbarui state lokal setelah penghapusan
-    setArchivedNotes(getArchivedNotes());
+    // Get note information before deleting for notification
+    const noteToDelete = getNote(id);
+    
+    if (noteToDelete) {
+      deleteNote(id);
+      // Show warning notification
+      showWarning(`Catatan "${noteToDelete.title}" telah dihapus!`);
+      // Perbarui state lokal setelah penghapusan
+      setArchivedNotes(getArchivedNotes());
+    }
   };
   
   const onUnarchiveHandler = (id) => {
     console.log('ArchivesPage: Unarchiving note with id:', id);
-    unarchiveNote(id);
-    // Perbarui state lokal setelah pembatalan arsip
-    setArchivedNotes(getArchivedNotes());
+    // Get note information before unarchiving for notification
+    const noteToUnarchive = getNote(id);
+    
+    if (noteToUnarchive) {
+      unarchiveNote(id);
+      // Show success notification
+      showSuccess(`Catatan "${noteToUnarchive.title}" telah dipindahkan ke aktif!`);
+      // Perbarui state lokal setelah pembatalan arsip
+      setArchivedNotes(getArchivedNotes());
+    }
   };
   
   const handleViewNoteDetail = (id) => {

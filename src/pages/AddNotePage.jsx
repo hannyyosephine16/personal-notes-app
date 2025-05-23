@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { addNote } from '../utils/local-data';
+import { useNotification } from '../contexts/NotificationContext';
 
 function AddNotePage({ onBackToHome }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const { showSuccess } = useNotification();
   
   const onTitleChangeHandler = (event) => {
     setTitle(event.target.value);
@@ -20,11 +22,17 @@ function AddNotePage({ onBackToHome }) {
       event.stopPropagation();
     }
     console.log('AddNotePage: Adding note with title:', title);
-    addNote({
+    
+    // Add the note
+    const newNote = addNote({
       title,
       body
     });
     
+    // Show success notification
+    showSuccess(`Catatan "${newNote.title}" berhasil ditambahkan!`);
+    
+    // Navigate back to home
     onBackToHome();
   };
   

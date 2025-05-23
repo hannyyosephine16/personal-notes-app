@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getNote, deleteNote, archiveNote, unarchiveNote } from '../utils/local-data';
 import { showFormattedDate } from '../utils/index';
+import { useNotification } from '../contexts/NotificationContext';
 
 function NoteDetailPage({ noteId, onBackToHome }) {
   const [note, setNote] = useState(null);
+  const { showSuccess, showWarning } = useNotification();
   
   useEffect(() => {
     console.log('NoteDetailPage: Loading note with id:', noteId);
@@ -26,7 +28,17 @@ function NoteDetailPage({ noteId, onBackToHome }) {
       event.stopPropagation();
     }
     console.log('NoteDetailPage: Deleting note with id:', note.id);
+    
+    // Store title before deletion for notification
+    const noteTitle = note.title;
+    
+    // Delete the note
     deleteNote(note.id);
+    
+    // Show warning notification
+    showWarning(`Catatan "${noteTitle}" telah dihapus!`);
+    
+    // Navigate back to home
     onBackToHome();
   };
   
@@ -36,12 +48,15 @@ function NoteDetailPage({ noteId, onBackToHome }) {
       event.stopPropagation();
     }
     console.log('NoteDetailPage: Toggling archive status for note with id:', note.id);
+    
     if (note.archived) {
       unarchiveNote(note.id);
       setNote({ ...note, archived: false });
+      showSuccess(`Catatan "${note.title}" telah dipindahkan ke aktif!`);
     } else {
       archiveNote(note.id);
       setNote({ ...note, archived: true });
+      showSuccess(`Catatan "${note.title}" telah diarsipkan!`);
     }
   };
   
