@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { showFormattedDate } from '../utils/index';
+import { LocaleContext } from '../contexts/LocaleContext';
 import ConfirmationDialog from './ConfirmationDialog';
 
 function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, onViewDetail }) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const { texts } = useContext(LocaleContext);
 
   const handleDelete = (event) => {
     // Always stop propagation to prevent clicking the card
@@ -44,7 +46,7 @@ function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, o
       <div 
         className="note-item" 
         style={{ 
-          borderTopColor: archived ? '#F39C12' : '#BB86FC', 
+          borderTopColor: archived ? 'var(--warning)' : 'var(--primary)', 
           cursor: 'pointer',
           position: 'relative'
         }}
@@ -68,9 +70,9 @@ function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, o
           <button 
             onClick={handleDelete} 
             className="action" 
-            title="Delete"
+            title={texts.delete}
             style={{ 
-              backgroundColor: '#CF6679',
+              backgroundColor: 'var(--error)',
               position: 'relative',
               zIndex: 20
             }}
@@ -80,9 +82,9 @@ function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, o
           <button 
             onClick={handleArchive} 
             className="action" 
-            title={archived ? "Unarchive" : "Archive"}
+            title={archived ? texts.unarchive : texts.archive}
             style={{ 
-              backgroundColor: archived ? '#03DAC6' : '#F39C12',
+              backgroundColor: archived ? 'var(--secondary)' : 'var(--warning)',
               position: 'relative',
               zIndex: 20
             }}
@@ -94,7 +96,7 @@ function NoteCard({ id, title, body, createdAt, onDelete, onArchive, archived, o
 
       <ConfirmationDialog
         isOpen={showDeleteConfirmation}
-        message={`Apakah Anda yakin akan menghapus catatan "${title}"?`}
+        message={`${texts.deleteConfirm} "${title}"?`}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />

@@ -6,20 +6,28 @@ function ConfirmationDialog({ isOpen, message, onConfirm, onCancel }) {
 
   return (
     <div className="confirmation-dialog-overlay">
-      <div className="confirmation-dialog">
+      <div className="confirmation-dialog" style={{ backgroundColor: "#1E1E1E" }}>
         <div className="confirmation-dialog__content">
-          <p>{message}</p>
+          <p style={{ color: "#FFFFFF" }}>{message}</p>
         </div>
         <div className="confirmation-dialog__actions">
           <button 
             className="confirmation-dialog__button confirmation-dialog__button--cancel" 
             onClick={onCancel}
+            style={{ 
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              color: "#FFFFFF"
+            }}
           >
             Batal
           </button>
           <button 
             className="confirmation-dialog__button confirmation-dialog__button--confirm"
             onClick={onConfirm}
+            style={{ 
+              backgroundColor: "#CF6679",
+              color: "#FFFFFF"
+            }}
           >
             OK
           </button>

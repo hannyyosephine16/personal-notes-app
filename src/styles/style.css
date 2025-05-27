@@ -3,17 +3,24 @@
   --primary-variant: #3700B3;
   --secondary: #03DAC6;
   --background: #121212;
-  --surface: #121212;
+  --surface: #1E1E1E;
   --error: #CF6679;
   --warning: #F39C12;
+  --success: #4CAF50;
   --on-background: #FFFFFF;
   --on-background-grey: #c7c7c7;
   --on-surface: #FFFFFF;
 }
 
 [data-theme="light"] {
-  --background: #DDDDDD;
-  --suface: #FFFFFF;
+  --background: #F5F5F5;
+  --surface: #FFFFFF;
+  --primary: #6200EE;
+  --primary-variant: #3700B3;
+  --secondary: #03DAC6;
+  --error: #B00020;
+  --warning: #F39C12;
+  --success: #4CAF50;
   --on-background: #333333;
   --on-background-grey: #6d6d6d;
   --on-surface: #333333;
@@ -27,6 +34,7 @@
 
 a {
   color: var(--on-background);
+  text-decoration: none;
 }
 
 body {
@@ -63,6 +71,21 @@ header .navigation ul li {
 .search-bar {
   width: 100%;
   margin-top: 10px;
+}
+
+.search-bar input {
+  margin: 16px 0;
+  font-family: 'Inter', sans-serif;
+  background-color: transparent;
+  border: 1px solid var(--on-background);
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+  color: var(--on-background);
+}
+
+.search-bar input::placeholder {
+  color: var(--on-background-grey);
 }
 
 main {
@@ -147,6 +170,7 @@ main {
   gap: 16px;
   bottom: 32px;
   right: 32px;
+  z-index: 100;
 }
 
 .action {
@@ -199,88 +223,152 @@ main {
   color: var(--on-background-grey)
 }
 
-.search-bar input {
-  margin: 16px 0;
-  font-family: 'Inter', sans-serif;
-  background-color: transparent;
-  border: 1px solid var(--on-background);
-  border-radius: 4px;
-  padding: 8px;
-  width: 100%;
-  color: var(--on-background);
-}
-
-.search-bar input::placeholder {
-  color: var(--on-background-grey);
-}
-
-@media screen and (min-width: 650px) {
-  .notes-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .detail-page__title { 
-    font-size: 64px;
-  }
-  
-  header {
-    flex-wrap: nowrap;
-  }
-  
-  .search-bar {
-    width: auto;
-    margin-top: 0;
-  }
-}
-
-@media screen and (min-width: 850px) {
-  .notes-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  .notes-list {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Fix untuk memastikan button bisa diklik */
-.action {
-  position: relative;
-  z-index: 10;
-  pointer-events: auto;
-}
-
-/* Fix untuk memastikan container app tidak menghalangi event klik */
-.app-container {
-  position: relative;
-}
-
-/* Perbaikan untuk button yang ada di fixed position */
-.detail-page__action, .homepage__action, .add-new-page__action {
-  position: fixed;
+/* Auth styles */
+.auth-page {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.auth-toggle-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.theme-toggle, .locale-toggle {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle:hover, .locale-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-page h2, .register-page h2 {
+  margin-bottom: 24px;
+  text-align: center;
+  color: var(--primary);
+}
+
+.login-form, .register-form {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  bottom: 32px;
-  right: 32px;
-  z-index: 100;
 }
 
-/* Perbaikan untuk mobile */
-@media screen and (max-width: 768px) {
-  .detail-page__action, .homepage__action, .add-new-page__action {
-    bottom: 16px;
-    right: 16px;
-  }
-  
-  .action {
-    width: 48px;
-    height: 48px;
-  }
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Styling untuk custom confirmation dialog */
+.input-group label {
+  font-size: 14px;
+}
+
+.input-group input {
+  background-color: transparent;
+  border: 1px solid var(--on-background-grey);
+  border-radius: 4px;
+  padding: 10px;
+  color: var(--on-background);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Khusus untuk input password di mode gelap */
+input[type="password"] {
+  color: var(--on-background) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.input-group input.input-error {
+  border-color: var(--error);
+}
+
+.error-message {
+  color: var(--error);
+  font-size: 12px;
+}
+
+.login-button, .register-button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover, .register-button:hover {
+  background-color: var(--primary-variant);
+}
+
+.register-link, .login-link {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.logout-button {
+  background-color: var(--error);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #b33c56;
+}
+
+/* Styling untuk dialog konfirmasi */
 .confirmation-dialog-overlay {
   position: fixed;
   top: 0;
@@ -350,6 +438,86 @@ main {
 
 .confirmation-dialog__button--confirm:hover {
   background-color: #d55c6e;
+}
+
+/* Fix untuk memastikan button bisa diklik */
+.action {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* Fix untuk memastikan container app tidak menghalangi event klik */
+.app-container {
+  position: relative;
+}
+
+/* Perbaikan untuk button yang ada di fixed position */
+.detail-page__action, .homepage__action, .add-new-page__action {
+  position: fixed;
+  display: flex;
+  gap: 16px;
+  bottom: 32px;
+  right: 32px;
+  z-index: 100;
+}
+
+/* Fullpage loading spinner */
+.fullpage-spinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+/* Perbaikan untuk mobile */
+@media screen and (max-width: 768px) {
+  .detail-page__action, .homepage__action, .add-new-page__action {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .action {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media screen and (min-width: 650px) {
+  .notes-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detail-page__title { 
+    font-size: 64px;
+  }
+  
+  header {
+    flex-wrap: nowrap;
+  }
+  
+  .search-bar {
+    width: auto;
+    margin-top: 0;
+  }
+}
+
+@media screen and (min-width: 850px) {
+  .notes-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .notes-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 @keyframes fadeIn {

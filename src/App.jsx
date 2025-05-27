@@ -1,29 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import HomePage from './pages/HomePage';
 import ArchivesPage from './pages/ArchivesPage';
 import AddNotePage from './pages/AddNotePage';
 import NoteDetailPage from './pages/NoteDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
+import AuthPage from './pages/AuthPage';
 import Header from './components/Header';
-import { subscribeToChanges, getAllNotes } from './utils/local-data';
+import LoadingSpinner from './components/LoadingSpinner';
 import { getQueryParam, updateQueryParam } from './utils/url-utils';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { ThemeProvider, ThemeContext } from './contexts/ThemeContext';
+import { LocaleProvider, LocaleContext } from './contexts/LocaleContext';
+import { AuthProvider, AuthContext } from './contexts/AuthContext';
 
-function App() {
+function AppContent() {
   const [searchQuery, setSearchQuery] = useState(() => {
-    // Inisialisasi query pencarian dari URL
+    // Initialize search query from URL
     return getQueryParam('keyword') || '';
   });
   
   const [activePage, setActivePage] = useState('home');
   const [activeNoteId, setActiveNoteId] = useState(null);
-  const [forceUpdate, setForceUpdate] = useState(0);
   
-  // Menangani perubahan URL
+  const { authUser, isLoading } = useContext(AuthContext);
+  const { texts } = useContext(LocaleContext);
+  
+  // Handle URL changes
   useEffect(() => {
+    if (!authUser) return; // Don't process routes when not authenticated
+    
     const path = window.location.pathname;
     
-    // Periksa apakah path adalah path detail catatan
+    // Check if path is a note detail path
     if (path.startsWith('/notes/')) {
       const noteId = path.split('/notes/')[1];
       if (noteId === 'new') {
@@ -44,45 +52,28 @@ function App() {
       setActiveNoteId(null);
     }
     
-    // Perbarui query pencarian dari URL
+    // Update search query from URL
     const keyword = getQueryParam('keyword');
     if (keyword !== searchQuery) {
       setSearchQuery(keyword || '');
     }
-  }, []);
+  }, [authUser]);
   
-  // Berlangganan perubahan data catatan
+  // Update URL when search query changes
   useEffect(() => {
-    console.log('App mounted/updated, setting up subscription');
+    if (!authUser) return; // Don't update URL when not authenticated
     
-    const handleNotesChange = () => {
-      console.log('Notes changed, forcing update');
-      setForceUpdate(prev => prev + 1);
-    };
-    
-    const unsubscribe = subscribeToChanges(handleNotesChange);
-    
-    console.log('Current notes:', getAllNotes());
-    
-    return () => {
-      console.log('Cleaning up subscription');
-      unsubscribe();
-    };
-  }, []);
-  
-  // Perbarui URL saat query pencarian berubah
-  useEffect(() => {
     if (searchQuery) {
       updateQueryParam('keyword', searchQuery);
     } else {
-      updateQueryParam('keyword', null); // Hapus parameter
+      updateQueryParam('keyword', null); // Remove parameter
     }
-  }, [searchQuery]);
+  }, [searchQuery, authUser]);
   
   const handleViewNoteDetail = (id) => {
     console.log('Viewing note detail for id:', id);
     setActiveNoteId(id);
-    // Perbarui URL untuk mencerminkan perubahan
+    // Update URL to reflect the change
     window.history.pushState({}, '', id === 'new' ? '/notes/new' : `/notes/${id}`);
     setActivePage(id === 'new' ? 'add' : 'detail');
   };
@@ -90,9 +81,9 @@ function App() {
   const handleSetActivePage = (page) => {
     console.log('Setting active page to:', page);
     setActivePage(page);
-    setActiveNoteId(null); // Reset catatan aktif saat mengganti halaman
+    setActiveNoteId(null); // Reset active note when changing pages
     
-    // Perbarui URL untuk mencerminkan perubahan
+    // Update URL to reflect the change
     if (page === 'archives') {
       window.history.pushState({}, '', '/archives');
     } else if (page === 'home') {
@@ -108,6 +99,16 @@ function App() {
     setActivePage('home');
     window.history.pushState({}, '', '/');
   };
+  
+  // Show auth page if user is not authenticated
+  if (!authUser) {
+    return <AuthPage />;
+  }
+  
+  // Show loading spinner when fetching data
+  if (isLoading) {
+    return <LoadingSpinner fullPage />;
+  }
   
   const getMainContent = () => {
     if (activeNoteId === 'new') {
@@ -128,7 +129,6 @@ function App() {
       return <HomePage 
         searchQuery={searchQuery} 
         onViewDetail={handleViewNoteDetail}
-        key={`home-${forceUpdate}`}
       />;
     }
     
@@ -137,7 +137,6 @@ function App() {
       return <ArchivesPage 
         searchQuery={searchQuery} 
         onViewDetail={handleViewNoteDetail}
-        key={`archives-${forceUpdate}`}
       />;
     }
     
@@ -149,18 +148,30 @@ function App() {
   };
   
   return (
+    <div className="app-container">
+      <Header 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery} 
+        activePage={activePage} 
+        setActivePage={handleSetActivePage} 
+      />
+      <main>
+        {getMainContent()}
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <NotificationProvider>
-      <div className="app-container">
-        <Header 
-          searchQuery={searchQuery} 
-          setSearchQuery={setSearchQuery} 
-          activePage={activePage} 
-          setActivePage={handleSetActivePage} 
-        />
-        <main>
-          {getMainContent()}
-        </main>
-      </div>
+      <ThemeProvider>
+        <LocaleProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </LocaleProvider>
+      </ThemeProvider>
     </NotificationProvider>
   );
 }

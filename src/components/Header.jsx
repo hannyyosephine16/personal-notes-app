@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
+import { LocaleContext } from '../contexts/LocaleContext';
+import { AuthContext } from '../contexts/AuthContext';
+import ThemeToggle from './ThemeToggle';
+import LocaleToggle from './LocaleToggle';
 
 function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
+  const { texts } = useContext(LocaleContext);
+  const { authUser, onLogout } = useContext(AuthContext);
+  
   const onSearchChangeHandler = (event) => {
     const query = event.target.value;
     console.log('Search query changed to:', query);
@@ -20,9 +27,15 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
     setActivePage('archives');
   };
   
+  const handleLogout = (event) => {
+    event.preventDefault();
+    console.log('Logout button clicked');
+    onLogout();
+  };
+  
   return (
     <header>
-      <h1>Aplikasi Catatan</h1>
+      <h1>{texts.appTitle}</h1>
       <div className="navigation">
         <ul>
           <li>
@@ -37,7 +50,7 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
                 textDecoration: activePage === 'home' ? 'underline' : 'none'
               }}
             >
-              Beranda
+              {texts.home}
             </button>
           </li>
           <li>
@@ -52,15 +65,31 @@ function Header({ searchQuery, setSearchQuery, activePage, setActivePage }) {
                 textDecoration: activePage === 'archives' ? 'underline' : 'none'
               }}
             >
-              Arsip
+              {texts.archives}
             </button>
           </li>
         </ul>
       </div>
+      <div className="header-actions">
+        <div className="toggle-buttons">
+          <ThemeToggle />
+          <LocaleToggle />
+        </div>
+        <div className="user-info">
+          <span>{authUser.name}</span>
+          <button 
+            onClick={handleLogout}
+            className="logout-button"
+            title={texts.logout}
+          >
+            {texts.logout}
+          </button>
+        </div>
+      </div>
       <div className="search-bar">
         <input 
           type="text"
-          placeholder="Cari catatan berdasarkan judul..."
+          placeholder={texts.searchPlaceholder}
           value={searchQuery}
           onChange={onSearchChangeHandler}
         />

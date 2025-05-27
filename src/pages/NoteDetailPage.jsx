@@ -1,27 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { getNote, deleteNote, archiveNote, unarchiveNote } from '../utils/local-data';
+import { getNote, deleteNote, archiveNote, unarchiveNote } from '../utils/network-data';
 import { showFormattedDate } from '../utils/index';
+import { LocaleContext } from '../contexts/LocaleContext';
+import { AuthContext } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function NoteDetailPage({ noteId, onBackToHome }) {
   const [note, setNote] = useState(null);
+  const [isLoadingNote, setIsLoadingNote] = useState(true);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const { showSuccess, showWarning } = useNotification();
+  
+  const { texts } = useContext(LocaleContext);
+  const { setIsLoading } = useContext(AuthContext);
+  const { showSuccess, showWarning, showError } = useNotification();
   
   useEffect(() => {
     console.log('NoteDetailPage: Loading note with id:', noteId);
-    const selectedNote = getNote(noteId);
-    if (selectedNote) {
-      console.log('Note found:', selectedNote);
-      setNote(selectedNote);
-    } else {
-      console.log('Note not found, navigating to 404');
-      // Arahkan ke halaman 404 jika catatan tidak ditemukan
-      window.history.pushState({}, '', '/404');
-      onBackToHome();
-    }
+    
+    const fetchNote = async () => {
+      setIsLoadingNote(true);
+      try {
+        const { error, data, message } = await getNote(noteId);
+        if (error) {
+          showError(message || 'Failed to fetch note');
+          // Navigate to 404 page if note not found
+          window.history.pushState({}, '', '/404');
+          onBackToHome();
+        } else {
+          console.log('Note found:', data);
+          setNote(data);
+        }
+      } catch (error) {
+        console.error('Error fetching note:', error);
+        showError('An error occurred while fetching the note');
+        // Navigate to 404 page if error
+        window.history.pushState({}, '', '/404');
+        onBackToHome();
+      } finally {
+        setIsLoadingNote(false);
+      }
+    };
+    
+    fetchNote();
   }, [noteId, onBackToHome]);
   
   const onDeleteHandler = (event) => {
@@ -34,46 +57,79 @@ function NoteDetailPage({ noteId, onBackToHome }) {
     setShowDeleteConfirmation(true);
   };
   
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     console.log('NoteDetailPage: Deleting note with id:', note.id);
     
     // Store title before deletion for notification
     const noteTitle = note.title;
     
-    // Delete the note
-    deleteNote(note.id);
-    
-    // Show warning notification
-    showWarning(`Catatan "${noteTitle}" telah dihapus!`);
-    
-    // Navigate back to home
-    onBackToHome();
+    setIsLoading(true);
+    try {
+      const { error, message } = await deleteNote(note.id);
+      
+      if (error) {
+        showError(message || 'Failed to delete note');
+      } else {
+        // Show warning notification
+        showWarning(`${texts.noteDeleted}`);
+        // Navigate back to home
+        onBackToHome();
+      }
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      showError('An error occurred while deleting the note');
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirmation(false);
+    }
   };
   
   const cancelDelete = () => {
     setShowDeleteConfirmation(false);
   };
   
-  const onArchiveHandler = (event) => {
+  const onArchiveHandler = async (event) => {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
     console.log('NoteDetailPage: Toggling archive status for note with id:', note.id);
     
-    if (note.archived) {
-      unarchiveNote(note.id);
-      setNote({ ...note, archived: false });
-      showSuccess(`Catatan "${note.title}" telah dipindahkan ke aktif!`);
-    } else {
-      archiveNote(note.id);
-      setNote({ ...note, archived: true });
-      showSuccess(`Catatan "${note.title}" telah diarsipkan!`);
+    setIsLoading(true);
+    try {
+      if (note.archived) {
+        const { error, message } = await unarchiveNote(note.id);
+        
+        if (error) {
+          showError(message || 'Failed to unarchive note');
+        } else {
+          setNote({ ...note, archived: false });
+          showSuccess(`${texts.noteUnarchived}`);
+        }
+      } else {
+        const { error, message } = await archiveNote(note.id);
+        
+        if (error) {
+          showError(message || 'Failed to archive note');
+        } else {
+          setNote({ ...note, archived: true });
+          showSuccess(`${texts.noteArchived}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling archive status:', error);
+      showError('An error occurred while updating the note');
+    } finally {
+      setIsLoading(false);
     }
   };
   
+  if (isLoadingNote) {
+    return <LoadingSpinner />;
+  }
+  
   if (!note) {
-    return <p>Memuat...</p>;
+    return <p>{texts.loading}</p>;
   }
   
   return (
@@ -87,11 +143,11 @@ function NoteDetailPage({ noteId, onBackToHome }) {
             className="action" 
             onClick={onDeleteHandler}
             style={{ 
-              backgroundColor: '#CF6679',
+              backgroundColor: 'var(--error)',
               position: 'relative',
               zIndex: 100
             }}
-            title="Hapus"
+            title={texts.delete}
           >
             🗑️
           </button>
@@ -99,11 +155,11 @@ function NoteDetailPage({ noteId, onBackToHome }) {
             className="action" 
             onClick={onArchiveHandler}
             style={{ 
-              backgroundColor: note.archived ? '#03DAC6' : '#F39C12',
+              backgroundColor: note.archived ? 'var(--secondary)' : 'var(--warning)',
               position: 'relative',
               zIndex: 100
             }}
-            title={note.archived ? "Batal Arsip" : "Arsipkan"}
+            title={note.archived ? texts.unarchive : texts.archive}
           >
             {note.archived ? '⟲' : '📁'}
           </button>
@@ -112,7 +168,7 @@ function NoteDetailPage({ noteId, onBackToHome }) {
 
       <ConfirmationDialog
         isOpen={showDeleteConfirmation}
-        message={`Apakah Anda yakin akan menghapus catatan "${note.title}"?`}
+        message={`${texts.deleteConfirm} "${note.title}"?`}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />

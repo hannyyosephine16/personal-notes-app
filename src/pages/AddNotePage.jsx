@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { addNote } from '../utils/local-data';
+import { addNote } from '../utils/network-data';
+import { LocaleContext } from '../contexts/LocaleContext';
+import { AuthContext } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function AddNotePage({ onBackToHome }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [titleError, setTitleError] = useState('');
-  const { showSuccess } = useNotification();
+  
+  const { texts } = useContext(LocaleContext);
+  const { isLoading, setIsLoading } = useContext(AuthContext);
+  const { showSuccess, showError } = useNotification();
   
   const onTitleChangeHandler = (event) => {
     const newTitle = event.target.value;
@@ -28,7 +34,7 @@ function AddNotePage({ onBackToHome }) {
     
     // Validate title is not empty
     if (!title.trim()) {
-      setTitleError('Judul catatan tidak boleh kosong!');
+      setTitleError(texts.titleRequired);
       isValid = false;
     } else {
       setTitleError('');
@@ -37,7 +43,7 @@ function AddNotePage({ onBackToHome }) {
     return isValid;
   };
   
-  const onSubmitHandler = (event) => {
+  const onSubmitHandler = async (event) => {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -50,37 +56,49 @@ function AddNotePage({ onBackToHome }) {
     
     console.log('AddNotePage: Adding note with title:', title);
     
-    // Add the note
-    const newNote = addNote({
-      title,
-      body
-    });
-    
-    // Show success notification
-    showSuccess(`Catatan "${newNote.title}" berhasil ditambahkan!`);
-    
-    // Navigate back to home
-    onBackToHome();
+    setIsLoading(true);
+    try {
+      // Add the note
+      const { error, data, message } = await addNote({ title, body });
+      
+      if (error) {
+        showError(message || 'Failed to create note');
+      } else {
+        // Show success notification
+        showSuccess(`${texts.noteCreated}`);
+        // Navigate back to home
+        onBackToHome();
+      }
+    } catch (error) {
+      console.error('Error creating note:', error);
+      showError('An error occurred while creating the note');
+    } finally {
+      setIsLoading(false);
+    }
   };
+  
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
   
   return (
     <div className="add-new-page">
       <div className="add-new-page__input">
         <input
           className="add-new-page__input__title"
-          placeholder="Judul catatan"
+          placeholder={texts.titlePlaceholder}
           value={title}
           onChange={onTitleChangeHandler}
-          style={{ borderBottom: titleError ? '2px solid #CF6679' : 'none' }}
+          style={{ borderBottom: titleError ? '2px solid var(--error)' : 'none' }}
         />
         {titleError && (
-          <p style={{ color: '#CF6679', margin: '4px 0', fontSize: '14px' }}>
+          <p style={{ color: 'var(--error)', margin: '4px 0', fontSize: '14px' }}>
             {titleError}
           </p>
         )}
         <div
           className="add-new-page__input__body"
-          data-placeholder="Tulis catatan Anda di sini..."
+          data-placeholder={texts.bodyPlaceholder}
           contentEditable
           onInput={onBodyInputHandler}
         />
@@ -89,7 +107,7 @@ function AddNotePage({ onBackToHome }) {
         <button 
           className="action" 
           onClick={onSubmitHandler}
-          title="Simpan Catatan"
+          title={texts.save}
           style={{ 
             position: 'relative', 
             zIndex: 100 

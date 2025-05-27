@@ -1,46 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import NotesList from '../components/NotesList';
-import { getArchivedNotes, deleteNote, unarchiveNote, getNote } from '../utils/local-data';
+import { getArchivedNotes, deleteNote, unarchiveNote, getNote } from '../utils/network-data';
+import { LocaleContext } from '../contexts/LocaleContext';
+import { AuthContext } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function ArchivesPage({ searchQuery, onViewDetail }) {
   const [archivedNotes, setArchivedNotes] = useState([]);
-  const { showSuccess, showWarning } = useNotification();
+  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
+  const { texts } = useContext(LocaleContext);
+  const { setIsLoading } = useContext(AuthContext);
+  const { showSuccess, showWarning, showError } = useNotification();
   
   useEffect(() => {
-    // Dapatkan data baru pada pemuatan komponen
-    console.log('ArchivesPage: Loading archived notes');
-    const archived = getArchivedNotes();
-    console.log('Archived notes:', archived);
-    setArchivedNotes(archived);
+    // Get new data when component mounts
+    const fetchNotes = async () => {
+      setIsLoadingNotes(true);
+      try {
+        const { error, data, message } = await getArchivedNotes();
+        if (error) {
+          showError(message || 'Failed to fetch archived notes');
+          setArchivedNotes([]);
+        } else {
+          console.log('Archived notes:', data);
+          setArchivedNotes(data);
+        }
+      } catch (error) {
+        console.error('Error fetching archived notes:', error);
+        showError('An error occurred while fetching archived notes');
+        setArchivedNotes([]);
+      } finally {
+        setIsLoadingNotes(false);
+      }
+    };
+    
+    fetchNotes();
   }, []);
   
-  const onDeleteHandler = (id) => {
+  const onDeleteHandler = async (id) => {
     console.log('ArchivesPage: Deleting archived note with id:', id);
-    // Get note information before deleting for notification
-    const noteToDelete = getNote(id);
     
-    if (noteToDelete) {
-      deleteNote(id);
-      // Show warning notification
-      showWarning(`Catatan "${noteToDelete.title}" telah dihapus!`);
-      // Perbarui state lokal setelah penghapusan
-      setArchivedNotes(getArchivedNotes());
+    setIsLoading(true);
+    try {
+      // Get note information before deleting for notification
+      const { error: noteError, data: noteData } = await getNote(id);
+      
+      if (noteError) {
+        showError('Failed to get note information');
+        return;
+      }
+      
+      const { error, message } = await deleteNote(id);
+      
+      if (error) {
+        showError(message || 'Failed to delete note');
+      } else {
+        // Show warning notification
+        showWarning(`${texts.noteDeleted}`);
+        // Update local state after deletion
+        setArchivedNotes(archivedNotes.filter(note => note.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      showError('An error occurred while deleting the note');
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const onUnarchiveHandler = (id) => {
+  const onUnarchiveHandler = async (id) => {
     console.log('ArchivesPage: Unarchiving note with id:', id);
-    // Get note information before unarchiving for notification
-    const noteToUnarchive = getNote(id);
     
-    if (noteToUnarchive) {
-      unarchiveNote(id);
-      // Show success notification
-      showSuccess(`Catatan "${noteToUnarchive.title}" telah dipindahkan ke aktif!`);
-      // Perbarui state lokal setelah pembatalan arsip
-      setArchivedNotes(getArchivedNotes());
+    setIsLoading(true);
+    try {
+      // Get note information before unarchiving for notification
+      const { error: noteError, data: noteData } = await getNote(id);
+      
+      if (noteError) {
+        showError('Failed to get note information');
+        return;
+      }
+      
+      const { error, message } = await unarchiveNote(id);
+      
+      if (error) {
+        showError(message || 'Failed to unarchive note');
+      } else {
+        // Show success notification
+        showSuccess(`${texts.noteUnarchived}`);
+        // Update local state after unarchiving
+        setArchivedNotes(archivedNotes.filter(note => note.id !== id));
+      }
+    } catch (error) {
+      console.error('Error unarchiving note:', error);
+      showError('An error occurred while unarchiving the note');
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -53,14 +110,18 @@ function ArchivesPage({ searchQuery, onViewDetail }) {
     ? archivedNotes.filter(note => note.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : archivedNotes;
   
+  if (isLoadingNotes) {
+    return <LoadingSpinner />;
+  }
+  
   return (
     <div className="archives-page">
-      <h2>Catatan Terarsip</h2>
+      <h2>{texts.archivedNotes}</h2>
       <NotesList 
         notes={filteredNotes} 
         onDelete={onDeleteHandler} 
         onArchive={onUnarchiveHandler}
-        emptyMessage="Arsip kosong. Arsipkan beberapa catatan terlebih dahulu!"
+        emptyMessage={texts.emptyArchiveMessage}
         onViewDetail={handleViewNoteDetail}
       />
     </div>

@@ -1,46 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import NotesList from '../components/NotesList';
-import { getActiveNotes, deleteNote, archiveNote, getNote } from '../utils/local-data';
+import { getActiveNotes, deleteNote, archiveNote, getNote } from '../utils/network-data';
+import { LocaleContext } from '../contexts/LocaleContext';
+import { AuthContext } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function HomePage({ searchQuery, onViewDetail }) {
   const [notes, setNotes] = useState([]);
-  const { showSuccess, showWarning } = useNotification();
+  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
+  const { texts } = useContext(LocaleContext);
+  const { setIsLoading } = useContext(AuthContext);
+  const { showSuccess, showWarning, showError } = useNotification();
   
   useEffect(() => {
-    // Dapatkan data baru pada pemuatan komponen
-    console.log('HomePage: Loading active notes');
-    const activeNotes = getActiveNotes();
-    console.log('Active notes:', activeNotes);
-    setNotes(activeNotes);
+    // Get new data when component mounts
+    const fetchNotes = async () => {
+      setIsLoadingNotes(true);
+      try {
+        const { error, data, message } = await getActiveNotes();
+        if (error) {
+          showError(message || 'Failed to fetch notes');
+          setNotes([]);
+        } else {
+          console.log('Active notes:', data);
+          setNotes(data);
+        }
+      } catch (error) {
+        console.error('Error fetching notes:', error);
+        showError('An error occurred while fetching notes');
+        setNotes([]);
+      } finally {
+        setIsLoadingNotes(false);
+      }
+    };
+    
+    fetchNotes();
   }, []);
   
-  const onDeleteHandler = (id) => {
+  const onDeleteHandler = async (id) => {
     console.log('HomePage: Deleting note with id:', id);
-    // Get note information before deleting for notification
-    const noteToDelete = getNote(id);
     
-    if (noteToDelete) {
-      deleteNote(id);
-      // Show success notification
-      showWarning(`Catatan "${noteToDelete.title}" telah dihapus!`);
-      // Perbarui state lokal setelah penghapusan
-      setNotes(getActiveNotes());
+    setIsLoading(true);
+    try {
+      // Get note information before deleting for notification
+      const { error: noteError, data: noteData } = await getNote(id);
+      
+      if (noteError) {
+        showError('Failed to get note information');
+        return;
+      }
+      
+      const { error, message } = await deleteNote(id);
+      
+      if (error) {
+        showError(message || 'Failed to delete note');
+      } else {
+        // Show success notification
+        showWarning(`${texts.noteDeleted}`);
+        // Update local state after deletion
+        setNotes(notes.filter(note => note.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      showError('An error occurred while deleting the note');
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const onArchiveHandler = (id) => {
+  const onArchiveHandler = async (id) => {
     console.log('HomePage: Archiving note with id:', id);
-    // Get note information before archiving for notification
-    const noteToArchive = getNote(id);
     
-    if (noteToArchive) {
-      archiveNote(id);
-      // Show success notification
-      showSuccess(`Catatan "${noteToArchive.title}" telah diarsipkan!`);
-      // Perbarui state lokal setelah pengarsipan
-      setNotes(getActiveNotes());
+    setIsLoading(true);
+    try {
+      // Get note information before archiving for notification
+      const { error: noteError, data: noteData } = await getNote(id);
+      
+      if (noteError) {
+        showError('Failed to get note information');
+        return;
+      }
+      
+      const { error, message } = await archiveNote(id);
+      
+      if (error) {
+        showError(message || 'Failed to archive note');
+      } else {
+        // Show success notification
+        showSuccess(`${texts.noteArchived}`);
+        // Update local state after archiving
+        setNotes(notes.filter(note => note.id !== id));
+      }
+    } catch (error) {
+      console.error('Error archiving note:', error);
+      showError('An error occurred while archiving the note');
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -62,20 +119,24 @@ function HomePage({ searchQuery, onViewDetail }) {
     ? notes.filter(note => note.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : notes;
   
+  if (isLoadingNotes) {
+    return <LoadingSpinner />;
+  }
+  
   return (
     <div className="homepage">
-      <h2>Catatan Aktif</h2>
+      <h2>{texts.activeNotes}</h2>
       <NotesList 
         notes={filteredNotes} 
         onDelete={onDeleteHandler} 
         onArchive={onArchiveHandler}
-        emptyMessage="Tidak ada catatan. Buat catatan baru sekarang!"
+        emptyMessage={texts.emptyNotesMessage}
         onViewDetail={handleViewNoteDetail}
       />
       <div className="homepage__action">
         <button 
           className="action" 
-          title="Tambah Catatan Baru" 
+          title={texts.addNote} 
           onClick={handleAddNewNote}
           style={{ 
             position: 'relative', 

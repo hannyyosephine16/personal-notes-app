@@ -8,24 +8,34 @@ function Notification({ message, type, onClose, duration = 3000 }) {
     const timer = setTimeout(() => {
       setIsVisible(false);
       if (onClose) {
-        setTimeout(onClose, 300); // Allow time for animation before removing
+        setTimeout(onClose, 500); // Allow time for animation before removing
       }
     }, duration);
 
     return () => clearTimeout(timer);
   }, [duration, onClose]);
 
-  // Define styles based on notification type
+  // Determine background color based on message content or type
   const getBackgroundColor = () => {
-    switch (type) {
-      case 'success':
-        return '#4CAF50';
-      case 'error':
-        return '#CF6679';
-      case 'warning':
-        return '#F39C12';
-      default:
-        return '#BB86FC';
+    // Cek pesan untuk kata kunci spesifik
+    if (message.includes('deleted') || message.includes('dihapus')) {
+      return '#CF6679'; // Merah untuk pesan penghapusan
+    } else if (message.includes('archived') || message.includes('diarsipkan')) {
+      return '#F39C12'; // Kuning untuk pesan pengarsipan
+    } else if (message.includes('created') || message.includes('ditambahkan') || message.includes('berhasil')) {
+      return '#4CAF50'; // Hijau untuk pesan penambahan/berhasil
+    } else {
+      // Jika tidak cocok dengan kata kunci, gunakan tipe yang diberikan
+      switch (type) {
+        case 'success':
+          return '#4CAF50'; // Hijau
+        case 'error':
+          return '#CF6679'; // Merah
+        case 'warning':
+          return '#F39C12'; // Kuning
+        default:
+          return '#BB86FC'; // Ungu (default)
+      }
     }
   };
 
@@ -35,22 +45,35 @@ function Notification({ message, type, onClose, duration = 3000 }) {
         position: 'fixed',
         top: '20px',
         right: '20px',
-        padding: '12px 24px',
+        padding: '15px 20px',
         borderRadius: '8px',
         backgroundColor: getBackgroundColor(),
-        color: 'white',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        zIndex: 1000,
+        color: '#FFFFFF',
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+        zIndex: 9999,
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(-20px)',
-        transition: 'opacity 0.3s, transform 0.3s',
+        transition: 'opacity 0.5s, transform 0.5s',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        maxWidth: '400px'
+        minWidth: '300px',
+        maxWidth: '400px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        fontWeight: 'bold'
       }}
     >
-      <div>{message}</div>
+      <div
+        style={{
+          flexGrow: 1,
+          fontSize: '14px',
+          color: '#FFFFFF',
+          textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+          fontWeight: 'bold'
+        }}
+      >
+        {message}
+      </div>
       <button
         onClick={() => {
           setIsVisible(false);
@@ -61,11 +84,12 @@ function Notification({ message, type, onClose, duration = 3000 }) {
         style={{
           background: 'transparent',
           border: 'none',
-          color: 'white',
+          color: '#FFFFFF',
           cursor: 'pointer',
-          fontSize: '18px',
+          fontSize: '20px',
           marginLeft: '16px',
-          padding: '0 8px'
+          padding: '0 8px',
+          fontWeight: 'bold'
         }}
       >
         ×
