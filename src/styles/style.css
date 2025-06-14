@@ -6,7 +6,6 @@
   --surface: #1E1E1E;
   --error: #CF6679;
   --warning: #F39C12;
-  --success: #4CAF50;
   --on-background: #FFFFFF;
   --on-background-grey: #c7c7c7;
   --on-surface: #FFFFFF;
@@ -20,7 +19,6 @@
   --secondary: #03DAC6;
   --error: #B00020;
   --warning: #F39C12;
-  --success: #4CAF50;
   --on-background: #333333;
   --on-background-grey: #6d6d6d;
   --on-surface: #333333;
@@ -298,7 +296,7 @@ main {
 /* Khusus untuk input password di mode gelap */
 input[type="password"] {
   color: var(--on-background) !important;
-  background-color: rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .input-group input.input-error {
@@ -460,20 +458,6 @@ input[type="password"] {
   bottom: 32px;
   right: 32px;
   z-index: 100;
-}
-
-/* Fullpage loading spinner */
-.fullpage-spinner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
 }
 
 /* Perbaikan untuk mobile */
